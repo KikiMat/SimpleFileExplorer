@@ -1,0 +1,140 @@
+﻿<Window x:Class="SimpleFileExplorer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Model="clr-namespace:SimpleFileExplorer.Model"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+        mc:Ignorable="d"
+        Title="Simple File Explorer" 
+       WindowState="Maximized" Height="500" Width="800">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
+
+
+        </Grid.RowDefinitions>
+
+        <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Width="5" 
+                         HorizontalAlignment="Stretch" Visibility="Hidden" />
+        <materialDesign:Card Padding="16" Margin="16" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Height="Auto" Width="Auto">
+            <StackPanel Orientation="Horizontal" Margin="10,15,10,10" >
+                <!--<TextBox Name="Path" Text="{Binding Text , Mode=TwoWay}" Width="500"></TextBox>-->
+                <Button Style="{StaticResource MaterialDesignOutlinedButton}"    
+                ToolTip="MaterialDesignOutlinedButton" Name="Refresh" Width="100" Content="Refresh"  Margin="10,0,0,0" Click="Refresh_Click"/>
+                <Button Style="{StaticResource MaterialDesignOutlinedButton}" Name="BackOneLevel" Width="100" Content="Go Back"  Margin="10,0,40,0" Click="BackOneLevel_Click"/>
+
+                <TextBox Name="Path"  Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="16"
+                                    Text="{Binding Text , Mode=TwoWay}">
+                    <materialDesign:HintAssist.Hint>
+                        <StackPanel Margin="0,0,40,0" Orientation="Horizontal">
+                            <TextBlock><Run Text="Path" /></TextBlock>
+                        </StackPanel>
+                    </materialDesign:HintAssist.Hint>
+                </TextBox>
+            </StackPanel>
+        </materialDesign:Card>
+        <materialDesign:Card Padding="32" Margin="16" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Height="Auto">
+            <TreeView Name="Tree" ScrollViewer.CanContentScroll="True"  Margin="10,0,0,0"
+                  SelectedItemChanged="foldersItem_SelectedItemChanged" >
+                <TreeView.Resources>
+                    <Style TargetType="{x:Type Model:Root}">
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Name="image"  Width="30" Height="30" Stretch="Fill" 
+                                               Source="{Binding 
+                                               RelativeSource={RelativeSource 
+                                               Mode=FindAncestor, 
+                                               AncestorType={x:Type TreeViewItem}}, 
+                                               Path=SystemIcon}"/>
+                                        <TextBlock Name="Text" Text="{Binding}" Margin="5,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TreeView.Resources>
+            </TreeView>
+        </materialDesign:Card>
+        <materialDesign:Card Padding="32" Margin="16" Grid.Column="2" Grid.Row="1" Height="Auto">
+            <ListBox Name="test" ScrollViewer.CanContentScroll="True" >
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="LabelMouseDoubleClick" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label HorizontalAlignment="Left" Background="Transparent" DataContext="{Binding}" BorderThickness="1">
+                            <Label.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <!--<Image  VerticalAlignment="Center"
+                                          x:Name="image" 
+                                          Margin="5" 
+                                          Width="50" Height="50" />-->
+                                    <!--<Image  VerticalAlignment="Center"
+                                          x:Name="image" 
+                                          Margin="5" 
+                                          Width="50" Height="50" />-->
+                                    <StackPanel Orientation="Horizontal" Width="150" >
+                                        <Image   Width="50" Height="50"
+                                            Source="{Binding Path=SystemIcon, Mode=OneTime}"
+                                            Stretch="Fill"
+                                             />
+                                        <TextBlock x:Name="FriendlyName" 
+                                                 Text="{Binding FriendlyName}"  VerticalAlignment="Center" HorizontalAlignment="Left"  />
+                                    </StackPanel>
+                                   
+                                    <StackPanel 
+                                      VerticalAlignment="Center" HorizontalAlignment="Left" 
+                                      x:Name="Details" Margin="50,0,0,0">
+                                       
+                                        <TextBlock x:Name="FileType"
+                                                 Text="{Binding FileType}"/>
+                                        <TextBlock x:Name="Size" 
+                                                 HorizontalAlignment="Left" 
+                                                 Text="{Binding Size}"/>
+                                        <TextBlock x:Name="text" 
+                                                 HorizontalAlignment="Left" 
+                                                 Text="Last Updated"/>
+                                        <TextBlock x:Name="LastWriteTime" 
+                                                 HorizontalAlignment="Left" 
+                                                 Text="{Binding LastWriteTime}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Label.Content>
+                            <Label.ToolTip>
+                                <ToolTip Name="FileInfo" Placement="Mouse">
+                                    <TextBlock Text="{Binding FileName}"/>
+                                </ToolTip>
+                            </Label.ToolTip>
+                        </Label>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}},Path=IsSelected}" Value="True" >
+                                <Setter Property="Foreground" TargetName="FileType" Value="Blue" ></Setter>
+                                <Setter Property="Foreground" TargetName="LastWriteTime" Value="Blue" ></Setter>
+                                <Setter Property="FontWeight" TargetName="text" Value="Bold" ></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                
+            </ListBox>
+        </materialDesign:Card>
+        <StatusBar VerticalAlignment="Bottom" Grid.Row="2" Grid.Column="2" Background="Transparent" Margin="40,0,0,10">
+            <DockPanel Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type StatusBar}}}">
+                <TextBlock DockPanel.Dock="Left" Name="StatisticsArea" VerticalAlignment="Center" Height="40"/>
+            </DockPanel>
+        </StatusBar>
+    </Grid>
+
+</Window>
